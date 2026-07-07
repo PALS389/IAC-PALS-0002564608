@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Botón del Caos</title>
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 { font-size: 3rem; text-align: center; }
+        #contador { font-size: 6rem; font-weight: bold; margin-bottom: 2rem; color: #f1c40f; }
+        .boton-rojo {
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 15px #c0392b;
+            transition: all 0.1s;
+        }
+        .boton-rojo:active {
+            box-shadow: 0 5px #c0392b;
+            transform: translateY(10px);
+        }
+    </style>
+</head>
+<body>
+    <h1>DALE AL BOTON GAAAAAA</h1>
+    <div id="contador">0</div>
+    <button class="boton-rojo" onclick="presionarBoton()">¡NO TOCAR!</button>
+
+    <script>
+        async function presionarBoton() { 
+            const response = await fetch('/click', { method: 'POST' });
+            const data = await response.json();
+            document.getElementById('contador').innerText = data.total_clics;
+        }
+    </script>
+</body>
+</html>
