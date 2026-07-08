@@ -1,9 +1,19 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 import logging
+import os
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO, 
+    format="%(asctime)s - %(message)s",
+    handlers=[
+        logging.FileHandler("logs/app.log"),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -20,5 +30,7 @@ def read_root():
 def registrar_click():
     global contador_clics
     contador_clics += 1
-    logger.info(f"¡Alguien presionó el botón rojo! Total: {contador_clics}")
+    logger.info(f"¡Alguien presionó el botón rojo OÑO! Total: {contador_clics}")
     return {"total_clics": contador_clics}
+
+Instrumentator().instrument(app).expose(app)
