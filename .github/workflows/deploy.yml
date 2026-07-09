@@ -1,0 +1,47 @@
+name: Pipeline Maestro CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  seguridad_checkov:
+    name: Auditoría de Infraestructura (Checkov)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v3
+
+      - name: Ejecutar Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: terraform
+          framework: terraform
+          soft_fail: true 
+
+  despliegue_ansible:
+    name: Despliegue Automatizado con Ansible
+    needs: seguridad_checkov 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v3
+
+      - name: Configurar llave SSH para AWS
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/llave_aws
+          chmod 600 ~/.ssh/llave_aws
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Instalar Ansible en el Runner de GitHub
+        run: sudo apt update && sudo apt install ansible -y
+
+      - name: Inyectar la IP dinámica en el inventario
+        run: |
+          echo "[servidor_aws]" > ansible/hosts.ini
+          echo "${{ secrets.EC2_HOST }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/llave_aws" >> ansible/hosts.ini
+
+      - name: Ejecutar Despliegue en AWS
+        run: ansible-playbook -i ansible/hosts.ini ansible/deploy.yml
