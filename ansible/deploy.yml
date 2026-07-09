@@ -1,13 +1,13 @@
 ---
 - name: Despliegue Automatizado del Botón del Caos
   hosts: servidor_aws
-  become: yes
+  become: yes 
   tasks:
     - name: Actualizar repositorios e instalar Docker y Docker Compose
       apt:
         name:
           - docker.io
-          - docker-compose
+          - docker-compose-v2
         update_cache: yes
         state: present
 
@@ -51,6 +51,6 @@
         dest: /home/ubuntu/proyecto/
 
     - name: ¡Encender la infraestructura en la nube!
-      command: docker-compose up -d --build
+      command: docker compose up -d --build
       args:
         chdir: /home/ubuntu/proyecto
