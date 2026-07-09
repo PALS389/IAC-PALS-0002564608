@@ -1,0 +1,56 @@
+---
+- name: Despliegue Automatizado del Botón del Caos
+  hosts: servidor_aws
+  become: yes
+  tasks:
+    - name: Actualizar repositorios e instalar Docker y Docker Compose
+      apt:
+        name:
+          - docker.io
+          - docker-compose
+        update_cache: yes
+        state: present
+
+    - name: Asegurar que el servicio de Docker este encendido
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Dar permisos de Docker al usuario ubuntu
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Crear la carpeta del proyecto en el servidor de AWS
+      file:
+        path: /home/ubuntu/proyecto
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Copiar la carpeta 'app' (Backend y Frontend)
+      copy:
+        src: ../app
+        dest: /home/ubuntu/proyecto/
+
+    - name: Copiar la carpeta 'monitoring' (Prometheus y Promtail)
+      copy:
+        src: ../monitoring
+        dest: /home/ubuntu/proyecto/
+
+    - name: Copiar el Dockerfile
+      copy:
+        src: ../Dockerfile
+        dest: /home/ubuntu/proyecto/
+
+    - name: Copiar el orquestador docker-compose.yml
+      copy:
+        src: ../docker-compose.yml
+        dest: /home/ubuntu/proyecto/
+
+    - name: ¡Encender la infraestructura en la nube!
+      command: docker-compose up -d --build
+      args:
+        chdir: /home/ubuntu/proyecto
