@@ -61,7 +61,8 @@ def guardar_evento_en_s3(usuario, accion):
     
     # Esto sube el JSON a tu bucket
     s3.put_object(
-        Bucket='tu-nombre-de-bucket',
+        Bucket='boton-caos-piero-final-2026',
         Key=f"eventos/{nombre_archivo}",
         Body=json.dumps(data)
     )
+    
