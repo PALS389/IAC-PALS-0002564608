@@ -7,6 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./logs:/code/logs
+    environment:
+      - https://gurjyo2kuynnk5zrub3o7lovfa0ibzbv.lambda-url.us-east-1.on.aws/
 
   prometheus:
     image: prom/prometheus:latest
