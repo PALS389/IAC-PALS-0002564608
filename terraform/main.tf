@@ -52,6 +52,11 @@ resource "aws_instance" "servidor_boton" {
   key_name      = aws_key_pair.llave_ssh.key_name
   vpc_security_group_ids = [aws_security_group.boton_caos_sg.id]
 
+  # Disco duro a 20 GB
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp2"
+  } 
   tags = {
     Name = "Servidor-Boton-Caos"
   }
