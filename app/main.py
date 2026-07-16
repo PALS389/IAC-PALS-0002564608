@@ -6,6 +6,9 @@ import logging
 import os
 import httpx
 import os
+import boto3
+import json
+from datetime import datetime
 
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
@@ -45,3 +48,20 @@ def registrar_click():
     return {"total_clics": contador_clics}
 
 Instrumentator().instrument(app).expose(app)
+
+# Esta función la llamas cuando alguien hace clic en el botón
+def guardar_evento_en_s3(usuario, accion):
+    s3 = boto3.client('s3', region_name='us-east-1')
+    data = {
+        "usuario": usuario,
+        "accion": accion,
+        "timestamp": str(datetime.now())
+    }
+    nombre_archivo = f"evento_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    
+    # Esto sube el JSON a tu bucket
+    s3.put_object(
+        Bucket='tu-nombre-de-bucket',
+        Key=f"eventos/{nombre_archivo}",
+        Body=json.dumps(data)
+    )
