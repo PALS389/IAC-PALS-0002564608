@@ -36,7 +36,15 @@ def registrar_click():
     global contador_clics
     contador_clics += 1
     logger.info(f"¡Alguien presionó el botón rojo OÑO! Total: {contador_clics}")
-    #LAMBDA
+    
+    # Llamamos a la función
+    try:
+        guardar_evento_en_s3("usuario_frontend", "clic_boton_caos")
+        print("¡Evidencia enviada a S3 correctamente!")
+    except Exception as e:
+        print(f"Error escribiendo en S3 directamente: {e}")
+
+    # LAMBDA
     lambda_url = os.getenv("LAMBDA_URL")
     if lambda_url:
         try:
@@ -47,22 +55,3 @@ def registrar_click():
 
     return {"total_clics": contador_clics}
 
-Instrumentator().instrument(app).expose(app)
-
-# Esta función la llamas cuando alguien hace clic en el botón
-def guardar_evento_en_s3(usuario, accion):
-    s3 = boto3.client('s3', region_name='us-east-1')
-    data = {
-        "usuario": usuario,
-        "accion": accion,
-        "timestamp": str(datetime.now())
-    }
-    nombre_archivo = f"evento_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    
-    # Esto sube el JSON a tu bucket
-    s3.put_object(
-        Bucket='boton-caos-piero-final-2026',
-        Key=f"eventos/{nombre_archivo}",
-        Body=json.dumps(data)
-    )
-    
